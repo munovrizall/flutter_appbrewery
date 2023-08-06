@@ -1,7 +1,7 @@
 import 'networking.dart';
 
 const apiUrl = 'rest.coinapi.io';
-const apiKey = '7D3BC89E-47CD-458E-A539-5A33E8840014';
+const apiKey = '685BA50E-D2A1-442A-9265-3CEA7A6D1041';
 
 class CoinModel {
 

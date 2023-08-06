@@ -16,10 +16,14 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   CoinModel coinModel = CoinModel();
 
-  dynamic coinData;
+  dynamic coinDataBTC;
+  dynamic coinDataETH;
+  dynamic coinDataLTC;
   String selectedCurrency = 'USD';
   String coin = 'BTC';
-  String exchangeRate = '';
+  String exchangeRateBTC = '';
+  String exchangeRateETH = '';
+  String exchangeRateLTC = '';
 
   DropdownButton<String> setupAndroidDropdown() {
     List<DropdownMenuItem<String>> dropdownList = [];
@@ -35,8 +39,12 @@ class _PriceScreenState extends State<PriceScreen> {
       value: selectedCurrency,
       items: dropdownList,
       onChanged: (value) async {
-        coinData = await coinModel.getCoinRate(
+        coinDataBTC = await coinModel.getCoinRate(
             coin: 'BTC', currency: value!);
+        coinDataETH = await coinModel.getCoinRate(
+            coin: 'ETH', currency: value!);
+        coinDataLTC = await coinModel.getCoinRate(
+            coin: 'LTC', currency: value!);
         setState(() {
           selectedCurrency = value;
           updateUi();
@@ -64,18 +72,25 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void updateUi() async {
-    coinData =
-        await coinModel.getCoinRate(coin: 'BTC', currency: selectedCurrency);
+    coinDataBTC = await coinModel.getCoinRate(
+        coin: 'BTC', currency: selectedCurrency!);
+    coinDataETH = await coinModel.getCoinRate(
+        coin: 'ETH', currency: selectedCurrency!);
+    coinDataLTC = await coinModel.getCoinRate(
+        coin: 'LTC', currency: selectedCurrency!);
     setState(() {
       // double rate = coinData['rate'];
-      double coinRate = coinData['rate'];
-      exchangeRate = coinRate.toStringAsFixed(0);
+      double coinRateBTC = coinDataBTC['rate'];
+      double coinRateETH = coinDataETH['rate'];
+      double coinRateLTC = coinDataLTC['rate'];
+      exchangeRateBTC = coinRateBTC.toStringAsFixed(0);
+      exchangeRateETH = coinRateETH.toStringAsFixed(0);
+      exchangeRateLTC = coinRateLTC.toStringAsFixed(0);
     });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     updateUi();
   }
@@ -90,27 +105,18 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $exchangeRate $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          Column(
+            children: [
+              CoinCard(coin: 'BTC',
+                  exchangeRate: exchangeRateBTC,
+                  selectedCurrency: selectedCurrency),
+              CoinCard(coin: 'ETH',
+                  exchangeRate: exchangeRateETH,
+                  selectedCurrency: selectedCurrency),
+              CoinCard(coin: 'LTC',
+                  exchangeRate: exchangeRateLTC,
+                  selectedCurrency: selectedCurrency),
+            ],
           ),
           Container(
             height: 150.0,
@@ -120,6 +126,45 @@ class _PriceScreenState extends State<PriceScreen> {
             child: Platform.isIOS ? setupIosPicker() : setupAndroidDropdown(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CoinCard extends StatelessWidget {
+  const CoinCard({
+    super.key,
+    required this.coin,
+    required this.exchangeRate,
+    required this.selectedCurrency,
+  });
+
+  final String coin;
+  final String exchangeRate;
+  final String selectedCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+              vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $coin = $exchangeRate $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
