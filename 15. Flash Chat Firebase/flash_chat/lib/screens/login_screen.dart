@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void showSpinner(bool isShowing) {
     setState(() {
+    setState(() {
       _showSpinner = isShowing;
     });
   }
